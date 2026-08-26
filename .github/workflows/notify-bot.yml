@@ -1,0 +1,18 @@
+name: Notify Acecretary Bot
+on:
+    push: {}
+jobs:
+    build:
+        name: Build
+        if: ${{ !contains(github.event.commits[0].message, '--silent') }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: send telegram message on push to any branch
+              uses: appleboy/telegram-action@master
+              with:
+                  to: "-1002034673185"
+                  token: "6742954453:AAHUGeRJwpU6Gen7WdV1yCKBrLhOmrinHyU"
+                  format: "markdown"
+                  message: |
+                      ${{ github.actor }} [created commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) on ${{ github.repository }}:${{ github.ref_name }}.
+                      Message: ${{ github.event.commits[0].message }}

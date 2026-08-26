@@ -1,0 +1,171 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "array",
+    "items": { "$ref": "#/$defs/exercise" },
+
+    "$defs": {
+        "exercise": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title", "instruction", "questions", "category"],
+            "properties": {
+                "title": { "type": "string" },
+                "instruction": { "type": "string" },
+                "reading": { "type": "string" },
+                "questions": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/questions" }
+                },
+                "options": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                },
+                "category": {
+                    "type": "string",
+                    "enum": ["reading", "grammar", "listening", "others"]
+                },
+                "timestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "exercise_id": { "type": "string" },
+                "tags": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                },
+                "vocabulary": { "type": "string" }
+            },
+            "$comment": "The field `options` is currently a top-level list intended for select-type fitB questions. It may be cleaner to move that field into the relevant question objects, but that requires coordinated template & logic updates."
+        },
+
+        "questions": {
+            "type": "object",
+            "oneOf": [
+                { "$ref": "#/$defs/fitB" },
+                { "$ref": "#/$defs/tfng" },
+                { "$ref": "#/$defs/mcq" },
+                { "$ref": "#/$defs/sq" },
+                { "$ref": "#/$defs/instruction" },
+                { "$ref": "#/$defs/options" }
+            ]
+        },
+
+        "fitB": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "question"],
+            "properties": {
+                "type": { "const": "fitB" },
+                "question": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["type", "text"],
+                        "allOf": [
+                            {
+                                "if": { "properties": { "type": { "const": "blank" } } },
+                                "then": { "required": ["is_example"] }
+                            }
+                        ],
+                        "properties": {
+                            "type": {
+                                "enum": ["text", "blank"]
+                            },
+                            "text": {
+                                "type": "string"
+                            },
+                            "is_example": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "tfng": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "statements"],
+            "properties": {
+                "type": { "const": "tfng" },
+                "instruction": { "type": "string" },
+                "statements": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["statement", "answer"],
+
+                        "properties": {
+                            "statement": { "type": "string" },
+                            "answer": {
+                                "enum": ["T", "F", "NG"]
+                            },
+                            "is_example": { "type": "boolean" }
+                        }
+                    }
+                }
+            }
+        },
+
+        "mcq": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "question", "answer", "options"],
+            "properties": {
+                "type": { "const": "mcq" },
+                "question": { "type": "string" },
+                "answer": {
+                    "type": "string",
+                    "pattern": "^[a-z]$"
+                },
+                "options": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "propertyNames": {
+                        "pattern": "^[a-z]$"
+                    },
+                    "additionalProperties": { "type": "string" }
+                },
+                "is_example": { "type": "boolean" }
+            }
+        },
+
+        "sq": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "question", "answer"],
+            "properties": {
+                "type": { "const": "sq" },
+                "question": { "type": "string" },
+                "answer": { "type": "string" },
+                "is_example": { "type": "boolean" }
+            }
+        },
+
+        "instruction": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "text"],
+            "properties": {
+                "type": { "const": "instruction" },
+                "text": { "type": "string" }
+            }
+        },
+
+        "options": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "options"],
+            "properties": {
+                "type": { "const": "options" },
+                "options": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                }
+            }
+        }
+    }
+}

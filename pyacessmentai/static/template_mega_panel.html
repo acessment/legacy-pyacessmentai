@@ -1,0 +1,483 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ACEssment Exercise</title>
+        {% if font_size == 'sm' %}
+        <link rel="stylesheet" href="template_sm.css" />
+        {% elif font_size == 'lg' %}
+        <link rel="stylesheet" href="template_lg.css" />
+        {% elif font_size == 'xl' %}
+        <link rel="stylesheet" href="template_xl.css" />
+        {% else %}
+        <link rel="stylesheet" href="template.css" />
+        {% endif %}
+        <link href="https://fonts.cdnfonts.com/css/nimbus-roman-no9l" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+HK:wght@200..900&family=Noto+Sans+Symbols+2&display=swap"
+              rel="stylesheet" />
+    </head>
+    <body id="body">
+    {% if watermark_image or watermark_text %}
+    <div class="watermark-overlay" style="background-image: url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='200px' width='210px'><g transform='translate(-15, 100) rotate(-45)'>{% if watermark_image %}<image href='{{watermark_image}}' x='0' y='0' width='150' height='100'/>{% endif %} {% if watermark_text %}<text x='0' y='100' fill='rgb(0,0,0)' font-size='12'>{{watermark_text}}</text>{% endif %}</g></svg>&quot;);"></div>
+    {% endif %}
+    <div class="header">
+        {% if header_image %}
+        <img src="{{ header_image }}"
+                style="{{ header_image_size }}" />
+        {% elif header_text %}
+            {{ header_text }}
+        {% endif %}
+    </div>
+    <!-- header -->
+    <div class="footer">
+        {% if footer_image %}
+        <img src="{{ footer_image }}"
+                style="height: 18px" />
+        {% elif footer_text %}
+            {{ footer_text }}
+        {% endif %}
+    </div>
+    {% if render_queue %}
+        {% for segment in render_queue %}
+            <div class="content">
+                {% if segment.score %}
+                    <div class="score-div">
+                        <div class="score-box">
+                            <p>
+                                <span>Score:</span>
+                                <span contenteditable="true"
+                                      oninput="${script('save')}"
+                                      onblur="${script('apply')}"
+                                      track_id="_{{ segment.score.track_id }}">{{ segment.score | safe }}</span>
+                                {% if segment.score and segment.maxScore %}
+                                      <span>/ {{ segment.maxScore | safe }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if segment.title %}
+                    <h1 id="{{ segment.title.track_id }}"
+                        track_id="_{{ segment.title.track_id }}"
+                        contenteditable="true"
+                        oninput="${script('save')}"
+                        onblur="${script('apply')}">{{ segment.title }}</h1>
+                {% endif %}
+                {% if not segment.is_correction and segment.instruction %}
+                    <p track_id="_{{ segment.instruction.track_id }}"
+                       contenteditable="true"
+                       oninput="${script('save')}"
+                       onblur="${script('apply')}">{{ segment.instruction }}</p>
+                {% endif %}
+                {% if segment.reading %}
+                    {% if segment.line_number or hasLineNumber%}
+                        <div class="container reading-container">
+                            <div class="reading-passage-column">
+                                <div  render_id="reading-p-el" class="reading reading-w-line-num" >{{ segment.reading | safe }}</div>
+                            </div>
+                            <div class="line-number-column" id="reading_{{ segment.reading.track_id }}" >
+                                {% for i in range(segment.line_number|default(1)) %}
+                                    <p class="line-number">{{ i+1 }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="container">
+                            <p class="reading">{{ segment.reading | safe }}</p>
+                        </div>
+                    {% endif %}
+                {% endif %}
+                {% if segment.options %}
+                    <div class="sel-fitB-container" id="{{ segment.options.track_id }}">
+                        {% for option in segment.options %}
+                            <span class="option-fitB"
+                                  contenteditable="true"
+                                  oninput="${script('save')}"
+                                  onblur="${script('apply')}"
+                                  track_id="_{{ option.track_id }}">{{ option }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if segment.examples %}
+                    <div class="examples-container" id="{{ segment.examples.track_id }}">
+                        <p>Examples:</p>
+                        {% for example in segment.examples %}
+                            {% if ""~example.type == 'fitB' or ""~example.type == 'sel_fitB' or ""~example.type == 'art_fitB' %}
+                                {% for question_part in example['question'] %}
+                                    {% if ""~question_part.type == 'text' %}
+                                        <span contenteditable="true"
+                                              oninput="${script('save')}"
+                                              onblur="${script('apply')}"
+                                              track_id="_{{ question_part.text.track_id }}">{{ question_part.text }}</span>
+                                    {% elif ""~question_part.type == 'blank' %}
+                                        <span class="short-answer-line"
+                                              contenteditable="true"
+                                              oninput="${script('save')}"
+                                              onblur="${script('apply')}"
+                                              track_id="_{{ question_part.text.track_id }}">{{ question_part.text }}</span>
+                                    {% elif ""~question_part.type == 'longblank' %}
+                                        <span class="answer-line"
+                                              contenteditable="true"
+                                              oninput="${script('save')}"
+                                              onblur="${script('apply')}"
+                                              track_id="_{{ question_part.text.track_id }}">{{ question_part.text }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {{ example['question'] }}
+                                <p class="blank-answer-line"
+                                   contenteditable="true"
+                                   oninput="${script('save')}"
+                                   onblur="${script('apply')}"
+                                   track_id="_{{ example['answer'].track_id }}">{{ example['answer'] }}</p>
+                            {% endif %}
+                            <br />
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% set ns = namespace(question_number=0) %}
+                {% set questions = segment.questions %}
+                {% set is_correction = segment.is_correction %}
+                {% if questions %}
+                    <div class="outer_container" id="{{ segment.questions.track_id }}">
+                        {% for question in questions %}
+                            <div class="question_container">
+                                <div class="paragraph_sq"  id="{{ question.track_id }}">
+                                    {% set type = ""~question.get('type') %}
+                                    {% set ns.is_fitb = False %}
+                                    {% if type == 'mcq' %}
+                                        {% set ns.question_number = ns.question_number + 1 %}
+                                        <table class="question">
+                                            <tr>
+                                                <td class="q_number">
+                                                    <p>{{ " " ~ ns.question_number ~ "." if show_index else " " }}</p>
+                                                </td>
+                                                <td>
+                                                    <div class="question">
+                                                        <p contenteditable="true"
+                                                           oninput="${script('save')}"
+                                                           onblur="${script('apply')}"
+                                                           track_id="_{{ question.question.track_id }}"
+                                                           id="mcq_{{ question.question.track_id }}">
+                                                            {{ question.get("question") | default('This is a MC question with question number') }}
+                                                        </p>
+                                                    </div>
+                                                    <table width="100%" id="options_{{ question.question.track_id }}">
+                                                        {% for key, option in question.options.items() %}
+                                                            <tr>
+                                                                <td class="option-key">
+                                                                    {% if is_correction %}
+                                                                        {% if key.upper() == question.answer[:1].upper() %}
+                                                                            <span style="color:green">⬤</span>
+                                                                        {% elif is_correction and key.upper() == question.student_answer[:1].upper() and question.answer[:1].upper() != question.student_answer[:1].upper() %}
+                                                                            <span style="color:red">⬤</span>
+                                                                        {% else %}
+                                                                            <span style="font-size:11px">◯</span>
+                                                                        {% endif %}
+                                                                    {% elif key.upper() == question.answer[:1].upper() and (isSolution or question.is_example) %}
+                                                                        <span style="color:black">⬤</span>
+                                                                    {% else %}
+                                                                        <span style="font-size:11px">◯</span>
+                                                                    {% endif %}
+                                                                </td>
+                                                                <td class="option-key">
+                                                                    <span>{{ key.upper() }}.</span>
+                                                                </td>
+                                                                <td class="option-key" style="width: auto">
+                                                                    <span contenteditable="true"
+                                                                          oninput="${script('save')}"
+                                                                          onblur="${script('apply')}"
+                                                                          track_id="_{{ option.track_id }}">{{ option | default("This is option 1 with a circle blank at its left") }}</span>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    {% elif type == 'sq' or type == 'lq' %}
+                                        {% set ns.question_number = ns.question_number + 1 %}
+                                        <p>
+                                            <span>{{ " " ~ ns.question_number ~ ". " if show_index else " " }}</span>
+                                            <span contenteditable="true"
+                                                  id="sq_{{ question.question.track_id }}"
+                                                  track_id="_{{ question.question.track_id }}"
+                                                  oninput="${script('save')}"
+                                                  onblur="${script('apply')}">{{ question['question'] }}</span>
+                                        </p>
+                                        {% if segment.is_correction and not question.is_example %}
+                                            {% if question.is_correct %}
+                                                <p class="blank-answer-line"
+                                                   contenteditable="true"
+                                                   oninput="${script('save')}"
+                                                   onblur="${script('apply')}"
+                                                   track_id="_{{ question['student_answer'].track_id }}">
+                                                    {{ question['student_answer'] }} <span class="correct-answer">✓</span>
+                                                </p>
+                                            {% else %}
+                                                <p class="wrong-answer"
+                                                   contenteditable="true"
+                                                   oninput="${script('save')}"
+                                                   onblur="${script('apply')}"
+                                                   track_id="_{{ question['student_answer'].track_id }}">
+                                                    {{ question['student_answer'] }}
+                                                </p>
+                                                <p class="correct-answer blank-answer-line"
+                                                   contenteditable="true"
+                                                   oninput="${script('save')}"
+                                                   onblur="${script('apply')}"
+                                                   track_id="_{{ question['answer'].track_id }}">
+                                                    {{ question['answer'] }}
+                                                </p>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if isSolution or question['is_example'] %}
+                                                <p class="blank-answer-line"
+                                                   contenteditable="true"
+                                                   oninput="${script('save')}"
+                                                   onblur="${script('apply')}"
+                                                   track_id="_{{ question['answer'].track_id }}">
+                                                    {{ question['answer'] }}
+                                                </p>
+                                            {% else %}
+                                                <p class="sq-length"
+                                                   contenteditable="true"
+                                                   oninput="${script('save')}"
+                                                   onblur="${script('apply')}"
+                                                   track_id="_{{ question['answer'].track_id }}">
+                                                    _______________________________________________________________________________________
+                                                </p>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% elif ""~type == 'fitB' or ""~type == 'sel_fitB' or ""~type == 'art_fitB' %}
+                                        {% set ns.is_fitb = True %}
+                                        {% if is_correction %}
+                                            {% set ns.fitb_correct = True %}
+                                        {% endif %}
+                                        {% for question_part in question['question'] %}
+                                            {% if ""~question_part.type == 'text' %}
+                                                <span contenteditable="true"
+                                                      id="{{ question_part.text.track_id }}"
+                                                      track_id="_{{ question_part.text.track_id }}"
+                                                      oninput="${script('save')}"
+                                                      onblur="${script('apply')}">{{ question_part.text }}</span>
+                                            {% elif ""~question_part.type == 'blank' %}
+                                                {% if is_correction and not question_part.is_correct %}
+                                                    {% set ns.fitb_correct = False %}
+                                                {% endif %}
+                                                {% set ns.question_number = ns.question_number + 1 %}
+                                                <span>{{" " ~ ns.question_number ~ "." if show_index else " " }}</span>
+                                                {% if segment.is_correction and not question_part.is_example %}
+                                                    <span class="short-answer-line">
+                                                        {% if question_part.is_correct %}
+                                                            <span contenteditable="true"
+                                                                  oninput="${script('save')}"
+                                                                  onblur="${script('apply')}"
+                                                                  track_id="_{{ question_part.student_answer.track_id }}">{{ question_part.student_answer }}</span>
+                                                            <span class="correct-answer">✓</span>
+                                                        {% else %}
+                                                            <span class="wrong-answer"
+                                                                  contenteditable="true"
+                                                                  oninput="${script('save')}"
+                                                                  onblur="${script('apply')}"
+                                                                  track_id="_{{ question_part.student_answer.track_id }}">{{ question_part.student_answer }}</span>
+                                                            <span class="correct-answer"
+                                                                  contenteditable="true"
+                                                                  oninput="${script('save')}"
+                                                                  onblur="${script('apply')}"
+                                                                  track_id="_{{ question_part.text.track_id }}"> ({{ question_part.text }})</span>
+                                                        {% endif %}
+                                                    </span>
+                                                    {% if segment.is_correction and question_part.explanation and question.inline_explanation %}
+                                                        <span class="explanation"
+                                                              contenteditable="true"
+                                                              oninput="${script('save')}"
+                                                              onblur="${script('apply')}"
+                                                              track_id="_{{ question_part.explanation.track_id }}"> {{ question_part.explanation }} </span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% if isSolution or question_part.is_example %}
+                                                        <span class="short-answer-line"
+                                                              contenteditable="true"
+                                                              track_id="_{{ question_part.text.track_id }}"
+                                                              oninput="${script('save')}"
+                                                              onblur="${script('apply')}">{{ question_part.text }}</span>
+                                                    {% else %}
+                                                        <span class=""
+                                                              contenteditable="true"
+                                                              track_id="_{{ question_part.text.track_id }}"
+                                                              oninput="${script('save')}"
+                                                              onblur="${script('apply')}">_________________</span>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% elif ""~question_part.type == 'example_blank' %}
+                                                <span class="short-answer-line">{{ question_part.text }}</span>
+                                            {% elif ""~question_part.type == 'longblank' %}
+                                                <span class="answer-line"
+                                                      contenteditable="true"
+                                                      oninput="${script('save')}"
+                                                      onblur="${script('apply')}"
+                                                      track_id="_{{ question_part.text.track_id }}">{{ question_part.text if isSolution }}</span>
+                                            {% elif ""~question_part.type == 'explanation' and question_part.explanation_text and is_correction %}
+                                                <span class="explanation"
+                                                      contenteditable="true"
+                                                      oninput="${script('save')}"
+                                                      onblur="${script('apply')}"
+                                                      track_id="_{{ question_part.explanation_text.track_id }}"> {{ question_part.explanation_text }} </span>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if segment.is_correction and question.explanation and not question.inline_explanation %}
+                                            <p class="explanation"
+                                               contenteditable="true"
+                                               oninput="${script('save')}"
+                                               onblur="${script('apply')}"
+                                               track_id="_{{ question.explanation.track_id }}">
+                                                {{ question.explanation }}
+                                            </p>
+                                        {% endif %}
+                                    {% elif type == 'tfng' %}
+                                        <div class="question">
+                                            <table width="100%" id="tfng_{{ loop.index }}">
+                                                <tr>
+                                                    <td></td>
+                                                    <th class="tfng-choice">T</th>
+                                                    <th class="tfng-choice">F</th>
+                                                    <th class="tfng-choice">NG</th>
+                                                </tr>
+                                                {% for statement in question.statements %}
+                                                    {% set ns.question_number = ns.question_number + 1 %}
+                                                    <tr>
+                                                        <td>
+                                                            <span>{{ " " ~ ns.question_number ~ ". " if show_index else " " }}</span>
+                                                            <span style="width: auto"
+                                                                  contenteditable="true"
+                                                                  oninput="${script('save')}"
+                                                                  onblur="${script('apply')}"
+                                                                  track_id="_{{ statement.statement.track_id }}"
+                                                                  id="{{ statement.statement.track_id }}">{{ statement.statement | default("Statement 1") }}</span>
+                                                        </td>
+                                                        <td class="tfng-choice">
+                                                            <span class="circle {% if ''~statement.answer == 'T' and (isSolution or statement.is_example) and not is_correction %}circle-answer{% elif ''~statement.answer == 'T' and is_correction %}circle-correct-answer{% elif ''~statement.answer != 'T' and ''~statement.student_answer == 'T' and is_correction %}circle-wrong-answer{% endif %}"></span>
+                                                        </td>
+                                                        <td class="tfng-choice">
+                                                            <span class="circle {% if ''~statement.answer == 'F' and (isSolution or statement.is_example) and not is_correction %}circle-answer{% elif ''~statement.answer == 'F' and is_correction %}circle-correct-answer{% elif ''~statement.answer != 'F' and ''~statement.student_answer == 'F' and is_correction %}circle-wrong-answer{% endif %}"></span>
+                                                        </td>
+                                                        <td class="tfng-choice">
+                                                            <span class="circle {% if ''~statement.answer == 'NG' and (isSolution or statement.is_example) and not is_correction %}circle-answer{% elif ''~statement.answer == 'NG' and is_correction %}circle-correct-answer{% elif ''~statement.answer != 'NG' and ''~statement.student_answer == 'NG' and is_correction %}circle-wrong-answer{% endif %}"></span>
+                                                        </td>
+                                                    </tr>
+                                                    {% if statement.explanation_text and statement.answer != statement.student_answer and is_correction %}
+                                                    <tr>
+                                                        <td colspan="4">
+                                                            <p class="explanation"
+                                                            contenteditable="true"
+                                                            oninput="${script('save')}"
+                                                            onblur="${script('apply')}"
+                                                            track_id="_{{ statement.explanation_text.track_id }}">
+                                                                {{ statement.explanation_text }}
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </table>
+                                        </div>
+                                    {% elif type == 'pfr' %}
+                                    <div class="question">
+                                        <p>Underline the error in the passage and write down the correct answers on the right. If you cannot found any errors, write down CORR on the blank space given.</p>
+                                        <div class="pfr-container">
+                                            <div class="pfr-article-{% if question.isTesting %}testing{% else %}column{% endif %}" render_id="pfr-article-div" id="pfr_{{ question.question.track_id }}" track_id="_{{ question.track_id }}">
+                                                {% for line in question['question'] %}
+                                                    <div class="pfr-article-text" id="{{ line.track_id }}" track_id="_{{ line.track_id }}">
+                                                    {% for question_part in line %}
+                                                        {% if ""~question_part.type == 'text' %}
+                                                            <span contenteditable="true"
+                                                                    oninput="${script('save')}"
+                                                                    onblur="${script('apply')}" track_id="_{{ question_part.text.track_id }}">{{ question_part.text~" " }}</span>
+                                                        {% elif ""~question_part.type == 'wrong' %}
+                                                            {% if isSolution or question_part.is_example %}
+                                                                <span contenteditable="true"
+                                                                    oninput="${script('save')}"
+                                                                    onblur="${script('apply')}" class="underline" track_id="_{{ question_part.text.track_id }}">{{ question_part.text~" " }}</span>
+                                                            {% else %}
+                                                                <span contenteditable="true"
+                                                                    oninput="${script('save')}"
+                                                                    onblur="${script('apply')}" class="" track_id="_{{ question_part.text.track_id }}">{{ question_part.text~" " }}</span>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="pfr-blank-{% if question.isTesting %}testing{% else %}column{% endif %}" id="pfr_blank_{{ question.question.track_id }}" track_id="_{{ question.track_id }}">
+                                                {% for line in question['question'] %}
+                                                    {% for question_part in line %}
+                                                        {% if ""~question_part.type == "correct" %}
+                                                            {% set ns.question_number = ns.question_number + 1 %}
+                                                            <div class="pfr-blank-text" track_id="_{{ question_part.text.track_id }}"><span contenteditable="true"
+                                                                    oninput="${script('save')}"
+                                                                    onblur="${script('apply')}">{{ " " ~ ns.question_number ~ ". " if show_index else " " }}</span>{% if isSolution or question_part.is_example %}{{ question_part.text }}{% else %}___________{% endif %}</div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% elif type == 'instruction' %}
+                                        <p class="inquestion-instruction">{{ question.text }}</p>
+                                    
+                                    {% elif type == 'options' %}
+                                        <div class="sel-fitB-container" id="{{ question.options.track_id }}">
+                                            {% for option in question.options %}
+                                                <span class="option-fitB"
+                                                    contenteditable="true"
+                                                    oninput="${script('save')}"
+                                                    onblur="${script('apply')}"
+                                                    track_id="_{{ option.track_id }}">{{ option }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %} 
+                                    {% if question.explanation_text and is_correction and ((not question.is_correct and not ns.is_fitb) or not ns.fitb_correct) %}
+                                        <p class="explanation"
+                                            contenteditable="true"
+                                            oninput="${script('save')}"
+                                            onblur="${script('apply')}"
+                                            track_id="_{{ question.explanation_text.track_id }}">
+                                            {{ question.explanation_text }}
+                                        </p>
+                                    {% endif %}  
+                                </div>
+                                <!-- paragraph_sq-->
+                                {% if question.images %}
+                                    <div class="image_container"
+                                         id="image_container_{{ question.track_id or loop.index }}">
+                                        {% for image in question.images %}
+                                            <img class="question_image"
+                                                 src="data:image/jpeg;base64,{{ image | safe }}"
+                                                 id="{{ image.track_id }}">
+                                        </img>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <!-- question_container -->
+                    {% endfor %}
+                    {% if segment.get('vocabulary') %}
+                        <div class="vocabulary">
+                            <p class="vocabulary-builder-title">Vocabulary Builder:</p>
+                            <p class="chinese"
+                               contenteditable="true"
+                               oninput="${script('save')}"
+                               onblur="${script('apply')}"
+                               track_id="_{{ segment.vocabulary.track_id }}">{{ segment.vocabulary | safe }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <!-- outer_container -->
+        </div>
+        <!-- content -->
+    {% endfor %}
+{% endif %}
+</body>
+</html>

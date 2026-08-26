@@ -1,0 +1,53 @@
+[
+    [
+        { "type": "text", "text": "Every morning, I eagerly prepare for school, which is just a short walk" },
+        { "type": "wrong", "text": "to" },
+        { "type": "correct", "text": "from" }
+    ],
+    [
+        { "type": "text", "text": "my house. The bright, cheerful classrooms are always filled with the sound" },
+        { "type": "wrong", "text": "of" },
+        { "type": "correct", "text": "by" }
+    ],
+    [
+        { "type": "text", "text": "laughing and chatting students. Yesterday, our teacher carefully explained" },
+        { "type": "wrong", "text": "explain" },
+        { "type": "correct", "text": "explained" }
+    ],
+    [
+        { "type": "text", "text": "a fascinating science experiment to us, and we worked together to complete" },
+        { "type": "wrong", "text": "it." },
+        { "type": "correct", "text": "it" }
+    ],
+    [
+        { "type": "text", "text": "During recess, my friends and I played happily in the playground, running" },
+        { "type": "wrong", "text": "quick" },
+        { "type": "correct", "text": "quickly" }
+    ],
+    [
+        { "type": "text", "text": "quickly and climbing high on the jungle gym. Afterward, we returned to our" },
+        { "type": "wrong", "text": "ours" },
+        { "type": "correct", "text": "our" }
+    ],
+    [
+        { "type": "text", "text": "desks, ready to learn more. In the afternoon, we had an art class where" },
+        { "type": "wrong", "text": "an" },
+        { "type": "correct", "text": "a" }
+    ],
+    [
+        { "type": "text", "text": "we painted colorful pictures using brushes of different sizes. I love how" },
+        { "type": "wrong", "text": "colorfull" },
+        { "type": "correct", "text": "colorful" }
+    ],
+    [
+        { "type": "text", "text": "every day at school is exciting and full of new adventures. School is a" },
+        { "type": "wrong", "text": "an" },
+        { "type": "correct", "text": "a" }
+    ],
+    [
+        { "type": "text", "text": "wonderful place where we not only gain knowledge but also make" },
+        { "type": "wrong", "text": "made" },
+        { "type": "correct", "text": "make" }
+    ],
+    [{ "type": "text", "text": "unforgettable memories with our friends." }]
+]

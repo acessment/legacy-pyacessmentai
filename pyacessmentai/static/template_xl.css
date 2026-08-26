@@ -1,0 +1,416 @@
+h1 {
+    font-size: 24px;
+    /* Adjust the font size as needed */
+}
+
+h2 {
+    font-size: 22px;
+    /* Adjust the font size as needed */
+}
+
+h3 {
+    font-size: 20px;
+    /* Adjust the font size as needed */
+}
+
+h4 {
+    font-size: 20px;
+    /* Adjust the font size as needed */
+}
+
+div.header {
+    display: block;
+    text-align: left;
+    position: running(header);
+    font-size: 18px;
+}
+
+div.footer {
+    display: block;
+    text-align: right;
+    position: running(footer);
+    font-family: "Nimbus Roman No9 L", "Times New Roman", "Comic Sans MS", cursive, "Cardo", "Noto Serif HK", serif,
+        "Noto Sans Symbols 2";
+    font-size: 18px;
+}
+
+div.content {
+    page-break-inside: avoid;
+    margin-bottom: 1em;
+    font-family: "Nimbus Roman No9 L", "Times New Roman", "Comic Sans MS", cursive, "Cardo", "Noto Serif HK", serif,
+        "Noto Sans Symbols 2";
+    font-size: 20px;
+}
+
+div.sel-fitB-container {
+    border: 1px solid;
+    padding: 10px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 50px;
+}
+.container {
+    overflow-wrap: break-word;
+    /* modern browsers */
+    word-wrap: break-word;
+}
+
+div.examples-container {
+    padding-bottom: 20px;
+    border-bottom: 2px dashed;
+}
+
+.reading {
+    text-align: justify;
+    overflow-wrap: break-word;
+    /* modern browsers */
+    word-wrap: break-word;
+    /* legacy / older browsers */
+}
+.underline {
+    text-decoration: underline;
+}
+
+.wrong-answer {
+    text-decoration: underline wavy;
+    color: red;
+}
+
+.correct-answer {
+    color: green;
+}
+
+p.wrong-answer {
+    line-height: 1em !important;
+}
+
+p.correct-answer {
+    line-height: 1em !important;
+}
+
+.explanation {
+    border: 1px solid blue;
+    font-size: 18px;
+    color: blue;
+    line-height: 1.5em;
+}
+
+@page {
+    size: A4;
+    margin: 2cm;
+
+    @top-left {
+        content: element(header);
+    }
+
+    @bottom-right {
+        content: element(footer);
+    }
+}
+
+@media screen {
+    body {
+        size: A4;
+        padding: 2cm;
+        width: 210mm;
+        border: 1px solid grey;
+        justify-self: center;
+    }
+}
+
+span {
+    page-break-inside: avoid;
+}
+
+span.option-fitB {
+    padding: 2px 6px 2px 6px;
+}
+
+table {
+    page-break-inside: avoid;
+}
+
+table.question {
+    width: 100%;
+    margin-bottom: 0.6em;
+}
+
+td.q_number {
+    width: 2em;
+    vertical-align: top;
+}
+
+p {
+    page-break-inside: avoid;
+    line-height: 1.28em;
+}
+
+.reading-w-line-num p,
+.reading-w-line-num h1,
+.reading-w-line-num h2,
+.reading-w-line-num h3,
+.reading-w-line-num h4 {
+    line-height: 1.28em;
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+} /* Ensure each line has the same height */
+
+.outer_container {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.question_container {
+    display: flex;
+}
+
+.question_image {
+    width: 140px;
+    padding: 4px;
+    height: auto;
+}
+
+.image_container {
+    border: 1px solid #787878;
+}
+
+.translation {
+    page-break-before: always;
+}
+
+.chinese {
+    font-family: "MingLiU";
+}
+
+.question {
+    margin-bottom: 5px;
+    page-break-inside: avoid;
+}
+
+.options {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.option {
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+}
+
+.option-key {
+    vertical-align: top;
+    text-align: start;
+    width: 1em;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.option:last-child {
+    margin-bottom: 0px;
+}
+
+.circle-text {
+}
+
+.circle {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 1px solid #000;
+    border-radius: 50%;
+    position: relative;
+    top: 2px;
+    align-self: center;
+}
+
+.circle-answer {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 1px solid #000;
+    background-color: #000;
+    border-radius: 50%;
+    position: relative;
+    top: 2px;
+    align-self: center;
+}
+
+.circle-wrong-answer {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 1px solid #000;
+    background-color: red;
+    border-radius: 50%;
+    position: relative;
+    top: 2px;
+    align-self: center;
+}
+
+.circle-correct-answer {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 1px solid #000;
+    background-color: green;
+    border-radius: 50%;
+    position: relative;
+    top: 2px;
+    align-self: center;
+}
+
+.answer-line {
+    padding-top: 1em;
+    text-decoration: underline;
+}
+
+.blank-answer-line {
+    width: 100%;
+    height: 1.2em;
+    border-bottom: 1px solid #000;
+}
+
+.short-answer-line {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    text-decoration: underline;
+}
+
+.sq-length {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.tfng-choice {
+    text-align: center;
+    align-items: center;
+    width: 3em;
+}
+
+.paragraph_sq {
+    line-height: 200%;
+    page-break-inside: avoid;
+    padding-right: 2em;
+    padding-bottom: 1em;
+    width: 100%;
+}
+
+.sq_div {
+    border: 1px solid black;
+    padding: 1em;
+    page-break-inside: avoid;
+}
+
+.long_blank {
+    width: 100%;
+    border-bottom: 1px solid black;
+}
+
+.score-div {
+    width: 100%;
+    display: flex;
+    justify-content: end;
+}
+
+.score-box {
+    border: 1px solid black;
+    padding: 0.5em;
+}
+
+.vocabulary {
+    border-top: 1px dashed black;
+}
+
+.vocabulary-builder-title {
+    text-decoration: underline;
+}
+
+.pfr-container,
+.reading-container {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    overflow-wrap: break-word;
+    /* modern browsers */
+    word-wrap: break-word;
+    /* legacy / older browsers */
+}
+
+.pfr-article-testing {
+    flex: 1;
+    padding-right: 12px;
+    width: 75%;
+}
+/* testing has less width because the final proofreading text could be longer 
+if the error is longer than the original*/
+
+.pfr-article-column {
+    flex: 1;
+    padding-right: 12px;
+    width: 85%;
+}
+
+.pfr-article-text {
+    line-height: 1.5;
+}
+
+.pfr-blank-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 15%;
+    white-space: nowrap;
+}
+
+.pfr-blank-testing {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 25%;
+    white-space: nowrap;
+}
+
+.pfr-blank-text {
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+}
+
+.reading-passage-column {
+    flex: 1;
+    padding-right: 12px;
+    width: 95%;
+}
+
+.line-number-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 5%;
+}
+.line-number {
+    line-height: 1.28em;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    white-space: nowrap;
+}
+
+/* Watermark overlay */
+
+.watermark-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    overflow: hidden;
+    opacity: 0.2;
+}
